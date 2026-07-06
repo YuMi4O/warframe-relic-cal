@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warframe 虚空遗物计算器</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+            padding: 20px;
+        }
+        .calculator {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+        }
+        .calculator h1 { color: #e0c068; font-size: 28px; text-align: center; margin-bottom: 10px; letter-spacing: 2px; }
+        .calculator .subtitle { color: #8892b0; text-align: center; font-size: 14px; margin-bottom: 8px; }
+        .calculator .author { color: #5a6785; text-align: center; font-size: 12px; margin-bottom: 30px; }
+        .calculator .author a { color: #8892b0; text-decoration: none; }
+        .form-group { margin-bottom: 25px; }
+        .form-group label { display: block; color: #ccd6f6; font-size: 15px; margin-bottom: 8px; font-weight: 500; }
+        .form-group select, .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23e0c068' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            cursor: pointer;
+        }
+        .form-group select option { background: #1a1a2e; color: #ffffff; }
+        .form-group select:focus, .form-group input:focus { border-color: #e0c068; box-shadow: 0 0 20px rgba(224, 192, 104, 0.2); }
+        .form-group input::placeholder { color: #5a6785; }
+        .priority-row { display: flex; gap: 8px; margin-top: 8px; align-items: center; }
+        .priority-input {
+            flex: 1;
+            padding: 10px 6px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            color: #ffffff;
+            font-size: 16px;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+            text-align: center;
+        }
+        .priority-input::placeholder { color: #5a6785; font-size: 12px; }
+        .priority-input:focus { border-color: #e0c068; box-shadow: 0 0 20px rgba(224, 192, 104, 0.2); }
+        .priority-separator { color: #ccd6f6; font-size: 18px; font-weight: bold; }
+        .calculate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #e0c068 0%, #c9a84c 100%);
+            border: none;
+            border-radius: 10px;
+            color: #1a1a2e;
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 10px;
+            letter-spacing: 2px;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+        .calculate-btn:hover { transform: translateY(-2px); box-shadow: 0 15px 30px rgba(224, 192, 104, 0.3); }
+        .calculate-btn:active { transform: translateY(0); }
+        .calculate-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; box-shadow: none; }
+        .result-section { margin-top: 30px; padding-top: 25px; border-top: 1px solid rgba(255, 255, 255, 0.1); }
+        .result-section label { display: block; color: #ccd6f6; font-size: 15px; margin-bottom: 10px; font-weight: 500; }
+        .result-section textarea {
+            width: 100%;
+            min-height: 400px;
+            padding: 14px 16px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: #e0c068;
+            font-size: 14px;
+            outline: none;
+            resize: vertical;
+            font-family: 'Consolas', 'Microsoft YaHei', monospace;
+            line-height: 1.8;
+        }
+        .result-section textarea:focus { border-color: #e0c068; }
+        .badge-group { display: flex; gap: 10px; margin-top: 8px; }
+        .badge {
+            background: rgba(224, 192, 104, 0.15);
+            border: 1px solid rgba(224, 192, 104, 0.3);
+            border-radius: 6px;
+            padding: 6px 14px;
+            color: #e0c068;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <h1>虚空遗物计算器</h1>
+        <p class="subtitle">精准计算核桃开启策略</p>
+        <p class="author">作者：深巷的倦猫 | QQ：405015657</p>
+
+        <div class="form-group">
+            <label>目标部件编号（1-6）</label>
+            <input type="number" id="targetPart" placeholder="输入目标部件编号" value="6" min="1" max="6">
+        </div>
+
+        <div class="form-group">
+            <label>目标部件需求个数</label>
+            <input type="number" id="targetCount" placeholder="输入需要的个数" value="1" min="1">
+        </div>
+
+        <div class="form-group">
+            <label>选取部件优先级（按核桃界面编号1-6）</label>
+            <div class="priority-row">
+                <input type="text" id="priority1" class="priority-input" placeholder="1" maxlength="2" value="6">
+                <span class="priority-separator">></span>
+                <input type="text" id="priority2" class="priority-input" placeholder="2" maxlength="2" value="5">
+                <span class="priority-separator">></span>
+                <input type="text" id="priority3" class="priority-input" placeholder="3" maxlength="2" value="4">
+                <span class="priority-separator">></span>
+                <input type="text" id="priority4" class="priority-input" placeholder="4" maxlength="2" value="3">
+                <span class="priority-separator">></span>
+                <input type="text" id="priority5" class="priority-input" placeholder="5" maxlength="2" value="2">
+                <span class="priority-separator">></span>
+                <input type="text" id="priority6" class="priority-input" placeholder="6" maxlength="2" value="1">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>计划开启的精炼等级</label>
+            <select id="refinement">
+                <option value="intact">完整</option>
+                <option value="exceptional">优良</option>
+                <option value="flawless">无瑕</option>
+                <option value="radiant" selected>光辉</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>开车方式</label>
+            <select id="squadType">
+                <option value="full">全上</option>
+                <option value="split">2-2轮</option>
+            </select>
+            <div class="badge-group">
+                <span class="badge">全上 = 一次4个奖励</span>
+                <span class="badge">2-2轮 = 一次2个奖励</span>
+            </div>
+        </div>
+
+        <button class="calculate-btn" onclick="calculate()">计 算</button>
+
+        <div class="result-section">
+            <label>计算结果</label>
+            <textarea id="result" placeholder="计算结果将显示在这里..." readonly></textarea>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            const refinement = document.getElementById('refinement').value;
+            const squadType = document.getElementById('squadType').value;
+            const targetPart = parseInt(document.getElementById('targetPart').value);
+            const targetCount = parseInt(document.getElementById('targetCount').value) || 1;
+
+            if (isNaN(targetPart) || targetPart < 1 || targetPart > 6) {
+                document.getElementById('result').value = '请输入有效的目标部件编号（1-6）';
+                return;
+            }
+
+            const priorities = [];
+            const usedNumbers = new Set();
+            for (let i = 1; i <= 6; i++) {
+                const val = parseInt(document.getElementById('priority' + i).value);
+                if (!isNaN(val) && val >= 1 && val <= 6 && !usedNumbers.has(val)) {
+                    priorities.push(val);
+                    usedNumbers.add(val);
+                }
+            }
+            if (priorities.length === 0) {
+                document.getElementById('result').value = '请至少填写一个有效的优先级数字(1-6)，且不能重复';
+                return;
+            }
+
+            function getPartProb(partNum, refinement) {
+                let copperProb, silverProb, goldProb;
+                if (refinement === 'intact') {
+                    copperProb = 0.76 / 3; silverProb = 0.22 / 2; goldProb = 0.02;
+                } else if (refinement === 'exceptional') {
+                    copperProb = 0.70 / 3; silverProb = 0.26 / 2; goldProb = 0.04;
+                } else if (refinement === 'flawless') {
+                    copperProb = 0.60 / 3; silverProb = 0.34 / 2; goldProb = 0.06;
+                } else {
+                    copperProb = 0.50 / 3; silverProb = 0.40 / 2; goldProb = 0.10;
+                }
+                if (partNum <= 3) return copperProb;
+                if (partNum <= 5) return silverProb;
+                return goldProb;
+            }
+
+            const squadSize = squadType === 'full' ? 4 : 2;
+            const totalSims = 5000;
+            const batchSize = 200;
+
+            const probTable = [];
+            for (let p = 1; p <= 6; p++) {
+                probTable[p] = getPartProb(p, refinement);
+            }
+
+            let runCounts = [];
+            let partCounts = {};
+            for (let p of priorities) partCounts[p] = 0;
+            let completedSims = 0;
+
+            document.getElementById('result').value = '计算中...';
+            document.querySelector('.calculate-btn').disabled = true;
+            document.querySelector('.calculate-btn').textContent = '计算中...';
+
+            function runBatch() {
+                const batchEnd = Math.min(completedSims + batchSize, totalSims);
+                
+                for (let sim = completedSims; sim < batchEnd; sim++) {
+                    let obtained = {};
+                    for (let p = 1; p <= 6; p++) obtained[p] = 0;
+                    let runs = 0;
+
+                    while (obtained[targetPart] < targetCount) {
+                        runs++;
+                        let rewardsThisRun = [];
+                        for (let i = 0; i < squadSize; i++) {
+                            let rand = Math.random();
+                            let cumProb = 0;
+                            for (let p = 1; p <= 6; p++) {
+                                cumProb += probTable[p];
+                                if (rand < cumProb) {
+                                    rewardsThisRun.push(p);
+                                    break;
+                                }
+                            }
+                        }
+                        if (rewardsThisRun.length > 0) {
+                            for (let p of priorities) {
+                                if (rewardsThisRun.includes(p)) {
+                                    obtained[p]++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                    runCounts.push(runs);
+                    for (let p of priorities) {
+                        if (!partCounts[p]) partCounts[p] = 0;
+                        partCounts[p] += obtained[p];
+                    }
+                }
+
+                completedSims = batchEnd;
+
+                if (completedSims < totalSims) {
+                    document.getElementById('result').value = `计算中... ${completedSims}/${totalSims}`;
+                    setTimeout(runBatch, 0);
+                } else {
+                    finishCalculation();
+                }
+            }
+
+            function finishCalculation() {
+                runCounts.sort((a, b) => a - b);
+                const avgRuns = runCounts.reduce((a, b) => a + b, 0) / totalSims;
+                const medianRuns = runCounts[Math.floor(totalSims * 0.50)];
+                const p80Runs = runCounts[Math.floor(totalSims * 0.80)];
+                const p95Runs = runCounts[Math.floor(totalSims * 0.95)];
+                const p99Runs = runCounts[Math.floor(totalSims * 0.99)];
+
+                const defenseRounds = squadType === 'full' ? 26 : 13;
+                function calcDefense(rounds) {
+                    const carsNeeded = Math.ceil(rounds / defenseRounds);
+                    const relicsNeeded = carsNeeded * defenseRounds;
+                    return { carsNeeded, relicsNeeded };
+                }
+
+                const refinementName = { 'intact': '完整', 'exceptional': '优良', 'flawless': '无瑕', 'radiant': '光辉' }[refinement];
+                const squadName = squadType === 'full' ? '全上(4人)' : '2-2轮(2人)';
+
+                let resultText = '';
+                resultText += `目标：部件${targetPart} × ${targetCount} 个 | ${refinementName} | ${squadName}\n`;
+                resultText += `选择优先级：${priorities.join(' > ')}\n`;
+                resultText += `──────────────────────────────\n`;
+                resultText += `【各部件平均获取数量】\n`;
+                for (let p of priorities) {
+                    const avgCount = (partCounts[p] / totalSims).toFixed(2);
+                    const quality = p <= 3 ? '铜' : p <= 5 ? '银' : '金';
+                    const isTarget = p === targetPart ? ' ★目标' : '';
+                    resultText += `  部件${p}(${quality})：${avgCount} 个${isTarget}\n`;
+                }
+                resultText += `\n【普通车】\n`;
+                resultText += `  平均开车轮次：${avgRuns.toFixed(1)} 次\n`;
+                resultText += `  你需准备核桃：${Math.ceil(avgRuns)} 个\n\n`;
+                resultText += `【防御车（${defenseRounds}轮/车）】\n`;
+                const defAvg = calcDefense(avgRuns);
+                resultText += `  需开车：${defAvg.carsNeeded} 车\n`;
+                resultText += `  你需准备核桃：${defAvg.relicsNeeded} 个\n`;
+                resultText += `──────────────────────────────\n`;
+                resultText += `【轮次分位数】\n`;
+                resultText += `  50%：${medianRuns} 轮 → 防御车 ${calcDefense(medianRuns).carsNeeded} 车（${calcDefense(medianRuns).relicsNeeded} 核桃）\n`;
+                resultText += `  80%：${p80Runs} 轮 → 防御车 ${calcDefense(p80Runs).carsNeeded} 车（${calcDefense(p80Runs).relicsNeeded} 核桃）\n`;
+                resultText += `  95%：${p95Runs} 轮 → 防御车 ${calcDefense(p95Runs).carsNeeded} 车（${calcDefense(p95Runs).relicsNeeded} 核桃）\n`;
+                resultText += `  99%：${p99Runs} 轮 → 防御车 ${calcDefense(p99Runs).carsNeeded} 车（${calcDefense(p99Runs).relicsNeeded} 核桃）\n\n`;
+                resultText += `基于 ${totalSims} 次模拟`;
+
+                document.getElementById('result').value = resultText;
+                document.querySelector('.calculate-btn').disabled = false;
+                document.querySelector('.calculate-btn').textContent = '计 算';
+            }
+
+            setTimeout(runBatch, 50);
+        }
+    </script>
+</body>
+</html>
