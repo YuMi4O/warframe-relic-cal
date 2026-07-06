@@ -20,7 +20,7 @@
 
 ## 在线体验
 
-> 部署后在此替换为你的 GitHub Pages 链接
+https://yumi4o.github.io/warframe-relic-cal/
 
 ## 概率数据
 
