@@ -27,8 +27,8 @@
         }
         .calculator h1 { color: #e0c068; font-size: 28px; text-align: center; margin-bottom: 10px; letter-spacing: 2px; }
         .calculator .subtitle { color: #8892b0; text-align: center; font-size: 14px; margin-bottom: 8px; }
-        .calculator .author { color: #5a6785; text-align: center; font-size: 12px; margin-bottom: 30px; }
-        .calculator .author a { color: #8892b0; text-decoration: none; }
+        .calculator .author { color: #5a6785; text-align: center; font-size: 12px; margin-bottom: 4px; }
+        .calculator .version { color: #5a6785; text-align: center; font-size: 11px; margin-bottom: 25px; letter-spacing: 1px; }
         .form-group { margin-bottom: 25px; }
         .form-group label { display: block; color: #ccd6f6; font-size: 15px; margin-bottom: 8px; font-weight: 500; }
         .form-group select, .form-group input {
@@ -105,7 +105,7 @@
             line-height: 1.8;
         }
         .result-section textarea:focus { border-color: #e0c068; }
-        .badge-group { display: flex; gap: 10px; margin-top: 8px; }
+        .badge-group { display: flex; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
         .badge {
             background: rgba(224, 192, 104, 0.15);
             border: 1px solid rgba(224, 192, 104, 0.3);
@@ -121,6 +121,7 @@
         <h1>虚空遗物计算器</h1>
         <p class="subtitle">精准计算核桃开启策略</p>
         <p class="author">作者：深巷的倦猫 | QQ：405015657</p>
+        <p class="version">v0.2.0</p>
 
         <div class="form-group">
             <label>目标部件编号（1-6）</label>
@@ -164,10 +165,12 @@
             <select id="squadType">
                 <option value="full">全上</option>
                 <option value="split">2-2轮</option>
+                <option value="solo">单开</option>
             </select>
             <div class="badge-group">
                 <span class="badge">全上 = 一次4个奖励</span>
                 <span class="badge">2-2轮 = 一次2个奖励</span>
+                <span class="badge">单开 = 一次1个奖励</span>
             </div>
         </div>
 
@@ -221,7 +224,8 @@
                 return goldProb;
             }
 
-            const squadSize = squadType === 'full' ? 4 : 2;
+            const squadSizeMap = { 'full': 4, 'split': 2, 'solo': 1 };
+            const squadSize = squadSizeMap[squadType];
             const totalSims = 10000;
             const batchSize = 200;
 
@@ -295,7 +299,8 @@
                 const p95Runs = runCounts[Math.floor(totalSims * 0.95)];
                 const p99Runs = runCounts[Math.floor(totalSims * 0.99)];
 
-                const defenseRounds = squadType === 'full' ? 26 : 13;
+                const defenseRoundsMap = { 'full': 26, 'split': 13, 'solo': 26 };
+                const defenseRounds = defenseRoundsMap[squadType];
                 function calcDefense(rounds) {
                     const carsNeeded = Math.ceil(rounds / defenseRounds);
                     const relicsNeeded = carsNeeded * defenseRounds;
@@ -303,7 +308,7 @@
                 }
 
                 const refinementName = { 'intact': '完整', 'exceptional': '优良', 'flawless': '无瑕', 'radiant': '光辉' }[refinement];
-                const squadName = squadType === 'full' ? '全上(4人)' : '2-2轮(2人)';
+                const squadName = squadType === 'full' ? '全上(4人)' : squadType === 'split' ? '2-2轮(2人)' : '单开(1人)';
 
                 let resultText = '';
                 resultText += `目标：部件${targetPart} × ${targetCount} 个 | ${refinementName} | ${squadName}\n`;
