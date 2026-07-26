@@ -121,7 +121,7 @@
         <h1>虚空遗物计算器</h1>
         <p class="subtitle">精准计算核桃开启策略</p>
         <p class="author">作者：深巷的倦猫 | QQ：405015657</p>
-        <p class="version">v0.2.0</p>
+        <p class="version">v0.2.1</p>
 
         <div class="form-group">
             <label>目标部件编号（1-6）</label>
@@ -301,10 +301,18 @@
 
                 const defenseRoundsMap = { 'full': 26, 'split': 13, 'solo': 26 };
                 const defenseRounds = defenseRoundsMap[squadType];
+
                 function calcDefense(rounds) {
-                    const carsNeeded = Math.ceil(rounds / defenseRounds);
-                    const relicsNeeded = carsNeeded * defenseRounds;
-                    return { carsNeeded, relicsNeeded };
+                    if (squadType === 'split') {
+                        // 2-2轮防御车：一车26轮，你出13个核桃，参与26次选奖励
+                        const carsNeeded = Math.ceil(rounds / 26);
+                        const relicsNeeded = carsNeeded * 13;
+                        return { carsNeeded, relicsNeeded };
+                    } else {
+                        const carsNeeded = Math.ceil(rounds / defenseRounds);
+                        const relicsNeeded = carsNeeded * defenseRounds;
+                        return { carsNeeded, relicsNeeded };
+                    }
                 }
 
                 const refinementName = { 'intact': '完整', 'exceptional': '优良', 'flawless': '无瑕', 'radiant': '光辉' }[refinement];
