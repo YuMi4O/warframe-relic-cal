@@ -121,7 +121,7 @@
         <h1>虚空遗物计算器</h1>
         <p class="subtitle">精准计算核桃开启策略</p>
         <p class="author">作者：深巷的倦猫 | QQ：405015657</p>
-        <p class="version">v0.2.2</p>
+        <p class="version">v0.2.3</p>
 
         <div class="form-group">
             <label>目标部件编号（1-6）</label>
@@ -304,9 +304,8 @@
 
                 function calcDefense(rounds) {
                     if (squadType === 'split') {
-                        // 2-2轮：普通车轮次÷2 = 实际出核桃数；防御车26轮/车
-                        const defenseRoundsEquivalent = rounds / 2;
-                        const carsNeeded = Math.ceil(defenseRoundsEquivalent / 26);
+                        // 2-2轮：1核桃=2轮，防御车26轮=13核桃
+                        const carsNeeded = Math.ceil(rounds / 26);
                         const relicsNeeded = carsNeeded * 13;
                         return { carsNeeded, relicsNeeded };
                     } else {
@@ -331,7 +330,8 @@
                     resultText += `  部件${p}(${quality})：${avgCount} 个${isTarget}\n`;
                 }
                 resultText += `\n【普通车】\n`;
-                resultText += `  平均开车轮次：${avgRuns.toFixed(1)} 次\n\n`;
+                resultText += `  平均开车轮次：${avgRuns.toFixed(1)} 次\n`;
+                resultText += `  你需准备核桃：${Math.ceil(avgRuns / 2)} 个\n\n`;
                 resultText += `【防御车（${defenseRounds}轮/车）】\n`;
                 const defAvg = calcDefense(avgRuns);
                 resultText += `  需开车：${defAvg.carsNeeded} 车\n`;
