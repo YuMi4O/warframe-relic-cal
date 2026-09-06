@@ -121,7 +121,7 @@
         <h1>虚空遗物计算器</h1>
         <p class="subtitle">精准计算核桃开启策略</p>
         <p class="author">作者：深巷的倦猫 | QQ：405015657</p>
-        <p class="version">v0.2.3</p>
+        <p class="version">v0.2.4</p>
 
         <div class="form-group">
             <label>目标部件编号（1-6）</label>
@@ -299,18 +299,15 @@
                 const p95Runs = runCounts[Math.floor(totalSims * 0.95)];
                 const p99Runs = runCounts[Math.floor(totalSims * 0.99)];
 
-                const defenseRoundsMap = { 'full': 26, 'split': 26, 'solo': 26 };
-                const defenseRounds = defenseRoundsMap[squadType];
-
                 function calcDefense(rounds) {
                     if (squadType === 'split') {
-                        // 2-2轮：1核桃=2轮，防御车26轮=13核桃
+                        // 2-2轮防御车：一车26轮，你出13个核桃
                         const carsNeeded = Math.ceil(rounds / 26);
                         const relicsNeeded = carsNeeded * 13;
                         return { carsNeeded, relicsNeeded };
                     } else {
-                        const carsNeeded = Math.ceil(rounds / defenseRounds);
-                        const relicsNeeded = carsNeeded * defenseRounds;
+                        const carsNeeded = Math.ceil(rounds / 26);
+                        const relicsNeeded = carsNeeded * 26;
                         return { carsNeeded, relicsNeeded };
                     }
                 }
@@ -329,10 +326,7 @@
                     const isTarget = p === targetPart ? ' ★目标' : '';
                     resultText += `  部件${p}(${quality})：${avgCount} 个${isTarget}\n`;
                 }
-                resultText += `\n【普通车】\n`;
-                resultText += `  平均开车轮次：${avgRuns.toFixed(1)} 次\n`;
-                resultText += `  你需准备核桃：${Math.ceil(avgRuns / 2)} 个\n\n`;
-                resultText += `【防御车（${defenseRounds}轮/车）】\n`;
+                resultText += `\n【防御车（26轮/车）】\n`;
                 const defAvg = calcDefense(avgRuns);
                 resultText += `  需开车：${defAvg.carsNeeded} 车\n`;
                 resultText += `  你需准备核桃：${defAvg.relicsNeeded} 个\n`;
